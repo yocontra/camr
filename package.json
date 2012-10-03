@@ -1,0 +1,32 @@
+{
+   "name":"hackery",
+   "description":"Hacking utilities",
+   "version":"0.0.1",
+   "homepage":"http://github.com/wearefractal/hackery",
+   "repository":"git://github.com/wearefractal/hackery.git",
+   "author":"Fractal <contact@wearefractal.com> (http://wearefractal.com/)",
+   "main":"./index.js",
+   
+   "dependencies":{
+      "coffee-script":"*",
+      "hackery":"*",
+      "shodanapi":"*",
+      "async":"*"
+   },
+   "devDependencies":{
+      "should":"*",
+      "mocha":"*"
+   },
+   "scripts":{
+      "test":"mocha"
+   },
+   "engines":{
+      "node":">= 0.4.0"
+   },
+   "licenses":[
+      {
+         "type":"MIT",
+         "url":"http://github.com/wearefractal/hackery/raw/master/LICENSE"
+      }
+   ]
+}
