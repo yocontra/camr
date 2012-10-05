@@ -5,24 +5,29 @@ fs = require 'fs'
 
 api = new Shodan 'o2J4sPGDw8yDCbaiFKRtpcCzA63gnguQ'
 
-api.search 'port:80 after:05/01/2012 WWW-Authenticate: Basic realm="netcam"', (err, res) -> # Run a search query
+total = 0
+api.search 'port:80 WWW-Authenticate: Basic realm="netcam"', 8000, (err, res) -> # Run a search query
   throw err if err?
   console.log "Found #{res.matches.length} results"
   hosts = (m.ip for m in res.matches)
-  out = []
-  trend = []
+  out = JSON.parse fs.readFileSync 'cams.json'
+  trend = JSON.parse fs.readFileSync 'trendnet.json'
   ping = (host, done) ->
     hackery.checkHttp {host:host}, (err, body) ->
+      ++total
+      console.log "#{total}/#{res.matches.length} | #{out.length}/#{res.matches.length}"
       return done() if err?
-      return done unless body? and typeof body is 'string'
+      return done() unless body? and typeof body is 'string'
       return done() if body.indexOf("401") isnt -1
       out.push host
-      trend.push host if body.indexOf("rdr.cgi") > -1
+      fs.writeFileSync 'cams.json', JSON.stringify out
+      if body.indexOf("rdr.cgi") > -1
+        trend.push host
+        console.log "trendnet: #{host}"
+        fs.writeFileSync 'trendnet.json', JSON.stringify trend
       done()
 
-  async.forEachLimit hosts, 10, ping, (err) ->
+  async.forEachLimit hosts, 50, ping, (err) ->
     throw err if err?
-    fs.writeFileSync 'cams.json', JSON.stringify out
-    fs.writeFileSync 'trendnet.json', JSON.stringify trend
     console.log "#{out.length} valid systems"
     console.log "#{trend.length} trendnet systems"
